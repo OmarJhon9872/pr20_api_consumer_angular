@@ -1,0 +1,10 @@
+#buscador{
+    margin-top: 30px;
+}
+
+#boton_agregar{
+    right: 45px;
+    bottom: 45px;
+    left: auto;
+    position: absolute;
+}

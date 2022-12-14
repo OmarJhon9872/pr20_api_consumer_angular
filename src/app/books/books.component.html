@@ -1,0 +1,46 @@
+<div fxLayoutAlign="center center" id="buscador">
+    <mat-form-field fxFlex="60%">
+        <!-- Solucion 1 -->
+        <!-- <input type="text" (keyup)="hacerFiltro($event)" matInput placeholder="Buscar"> -->
+        <input type="text" (keyup)="hacerFiltro($any($event.target).value)" matInput placeholder="Buscar">
+    </mat-form-field>
+</div>
+
+<mat-table [dataSource]="dataSource" matSort>
+    <!-- Columna de tabla -->
+    <ng-container matColumnDef="titulo">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>Titulo</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{element.titulo}}</mat-cell>
+    </ng-container>
+
+    <!-- Columna de tabla -->
+    <ng-container matColumnDef="descripcion">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>Descripcion</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{element.descripcion}}</mat-cell>
+    </ng-container>
+
+    <!-- Columna de tabla -->
+    <ng-container matColumnDef="autor">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>Autor</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{element.autor}}</mat-cell>
+    </ng-container>
+
+    <!-- Columna de tabla -->
+    <ng-container matColumnDef="precio">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>Precio</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{element.precio}}</mat-cell>
+    </ng-container>
+
+    <!-- Array no nombre de las columnas -->
+    <mat-header-row *matHeaderRowDef="desplegarColumnas"></mat-header-row>
+    <mat-row *matRowDef="let row, columns: desplegarColumnas"></mat-row>
+</mat-table>
+
+<mat-paginator [pageSize]="2"
+               [pageSizeOptions]="[1,5,10,20]"
+               showFirstLastButtons>
+</mat-paginator>
+
+<button mat-fab id="boton_agregar" color="warn" (click)="abrirDialog()">
+    <mat-icon>add</mat-icon>
+</button>

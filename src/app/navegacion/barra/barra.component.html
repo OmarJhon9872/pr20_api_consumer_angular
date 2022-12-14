@@ -1,0 +1,23 @@
+<mat-toolbar color="primary">
+    <button mat-icon-button (click)="onMenuToggleDispatch()">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <span>Mercado de libros</span>
+
+    <div fxFlex fxLayout fxLayoutAlign="end" fxHide.xs>
+        <ul fxLayout="row" fxLayoutGap="10px" class="navegacion-menu">
+            <li *ngIf="!estadoUsuario">
+                <a routerLink="/registrar">Registrar</a>
+            </li>
+            <li *ngIf="!estadoUsuario">
+                <a routerLink="/login">Login</a>
+            </li>
+            <li *ngIf="estadoUsuario">
+                <a routerLink="/">Home</a>
+            </li>
+            <li *ngIf="estadoUsuario" (click)="terminarSesion()">
+                <a routerLink="/">Salir</a>
+            </li>
+        </ul>
+    </div>
+</mat-toolbar>
