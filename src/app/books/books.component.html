@@ -2,11 +2,11 @@
     <mat-form-field fxFlex="60%">
         <!-- Solucion 1 -->
         <!-- <input type="text" (keyup)="hacerFiltro($event)" matInput placeholder="Buscar"> -->
-        <input type="text" (keyup)="hacerFiltro($any($event.target).value)" matInput placeholder="Buscar">
+        <input type="text" (keyup)="hacerFiltro($event)" matInput placeholder="Buscar">
     </mat-form-field>
 </div>
 
-<mat-table [dataSource]="dataSource" matSort>
+<mat-table [dataSource]="dataSource" matSort (matSortChange)="ordenarColumna($event)">
     <!-- Columna de tabla -->
     <ng-container matColumnDef="titulo">
         <mat-header-cell *matHeaderCellDef mat-sort-header>Titulo</mat-header-cell>
@@ -22,7 +22,7 @@
     <!-- Columna de tabla -->
     <ng-container matColumnDef="autor">
         <mat-header-cell *matHeaderCellDef mat-sort-header>Autor</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{element.autor}}</mat-cell>
+        <mat-cell *matCellDef="let element">{{element.autor.nombreCompleto}}</mat-cell>
     </ng-container>
 
     <!-- Columna de tabla -->
@@ -36,8 +36,11 @@
     <mat-row *matRowDef="let row, columns: desplegarColumnas"></mat-row>
 </mat-table>
 
-<mat-paginator [pageSize]="2"
-               [pageSizeOptions]="[1,5,10,20]"
+<mat-paginator [pageSize]="librosPorPagina"
+               [pageSizeOptions]="paginaCombo"
+               [length]="totalLibros"
+               #paginacion
+               (page)="eventoPaginador($event)"
                showFirstLastButtons>
 </mat-paginator>
 

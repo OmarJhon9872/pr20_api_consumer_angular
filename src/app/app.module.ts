@@ -19,10 +19,13 @@ import { BarraComponent } from './navegacion/barra/barra.component';
 import { MenuListaComponent } from './navegacion/menu-lista/menu-lista.component';
 import { SeguridadService } from './seguridad/seguridad.service';
 import { BooksComponent } from './books/books.component';
-import { BookService } from './books/books.service';
+// Se comenta ya que el servicio ya es accesible gracias al decorator
+// Inject de cada servicio
+// import { BookService } from './books/books.service';
 import { BookNuevoComponent } from './books/book-nuevo.component';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { AutoresComponent } from './autores/autores.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -45,12 +48,13 @@ import { AutoresComponent } from './autores/autores.component';
     FormsModule,
     BrowserAnimationsModule,
     MaterialModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    HttpClientModule
   ],
   providers: [
     LibroService,
     SeguridadService,
-    BookService,
+    // BookService,
     {provide: MAT_DATE_LOCALE, useValue: 'es-MX'}
   ],
   bootstrap: [AppComponent],

@@ -3,10 +3,11 @@ import { BookService } from './books.service';
 import {Books} from './books.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { BookNuevoComponent } from './book-nuevo.component';
 import { Subscription } from 'rxjs';
+import { PaginationBooks } from './pagination-books.model';
 
 @Component({
     selector: 'app-books',
@@ -28,6 +29,18 @@ export class BooksComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private bookSuscription: Subscription;
 
+    // Acciones para crear la paginacion del componente
+    protected totalLibros = 0;
+    protected librosPorPagina = 2;
+    protected paginaCombo = [1, 2, 5, 10];
+    protected paginaAcual = 1;
+    protected sort = "titulo";
+    protected sortDirection = 'asc';
+    protected filterValue = {};
+
+    // Timeout para hacer filtro de busqueda
+    timeout: any = null;
+
     constructor(private bookService: BookService,
                 private dialog: MatDialog) {}
 
@@ -38,25 +51,73 @@ export class BooksComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.bookSuscription = this.bookService.bookSubject.subscribe(() => {
-            this.dataSource.data = this.bookService.obtenerLibros();
-        })
-        this.dataSource.data = this.bookService.obtenerLibros();
+        this.bookService.obtenerLibros(this.librosPorPagina, this.paginaAcual, this.sort, this.sortDirection, this.filterValue);
+        this.bookService.obtenerActualListener()
+            .subscribe( (pagination: PaginationBooks) => {
+                this.dataSource = new MatTableDataSource<Books>(pagination.data);
+                this.totalLibros = pagination.totalRows;
+            });
     }
     ngOnDestroy(): void {
         this.bookSuscription.unsubscribe();
     }
 
-    hacerFiltro(valueFiltro: any){
+    ordenarColumna(event: any){
+        this.sort = event.active;
+        this.sortDirection = event.direction;
+
+        this.bookService.obtenerLibros(
+            this.librosPorPagina,
+            this.paginaAcual,
+            event.active,
+            event.direction,
+            this.filterValue
+        );
+    }
+
+    hacerFiltro(event: any){
         // <!-- Solucion 1 -->
         // const valueFiltro = (filtro.target as HTMLInputElement).value;
 
-        this.dataSource.filter = valueFiltro;
+        clearTimeout(this.timeout);
+
+        const $this = this;
+        this.timeout = setTimeout(() => {
+            if(event.keyCode != 13){
+                const filterValueLocal = {
+                    propiedad: "titulo",
+                    valor: (event.target as HTMLInputElement).value
+                }
+
+                $this.filterValue = filterValueLocal;
+
+                $this.bookService.obtenerLibros(
+                    $this.librosPorPagina,
+                    $this.paginaAcual,
+                    $this.sort,
+                    $this.sortDirection,
+                    filterValueLocal
+                );
+            }
+        }, 1000);
     }
 
     abrirDialog(){
-        this.dialog.open(BookNuevoComponent, {
-            width: '350px'
+        const dialogRef = this.dialog.open(BookNuevoComponent, {
+            width: '550px'
         });
+
+        // Evento para que cada que se cierre el dialog se actualice
+        // la lista de libros
+        dialogRef.afterClosed()
+            .subscribe( () => {
+                this.bookService.obtenerLibros(this.librosPorPagina, this.paginaAcual, this.sort, this.sortDirection, this.filterValue);
+            });
+    }
+
+    eventoPaginador(event: PageEvent){
+        this.librosPorPagina = event.pageSize;
+        this.paginaAcual = event.pageIndex + 1;
+        this.bookService.obtenerLibros(this.librosPorPagina, this.paginaAcual, this.sort, this.sortDirection, this.filterValue);
     }
 }
