@@ -17,7 +17,7 @@ import { LoginComponent } from './seguridad/login/login.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BarraComponent } from './navegacion/barra/barra.component';
 import { MenuListaComponent } from './navegacion/menu-lista/menu-lista.component';
-import { SeguridadService } from './seguridad/seguridad.service';
+// import { SeguridadService } from './seguridad/seguridad.service';
 import { BooksComponent } from './books/books.component';
 // Se comenta ya que el servicio ya es accesible gracias al decorator
 // Inject de cada servicio
@@ -25,7 +25,8 @@ import { BooksComponent } from './books/books.component';
 import { BookNuevoComponent } from './books/book-nuevo.component';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { AutoresComponent } from './autores/autores.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { SeguridadInterceptor } from './seguridad/seguridad-interceptor';
 
 @NgModule({
   declarations: [
@@ -53,9 +54,10 @@ import { HttpClientModule } from '@angular/common/http';
   ],
   providers: [
     LibroService,
-    SeguridadService,
+    // SeguridadService,
     // BookService,
-    {provide: MAT_DATE_LOCALE, useValue: 'es-MX'}
+    {provide: MAT_DATE_LOCALE, useValue: 'es-MX'},
+    {provide: HTTP_INTERCEPTORS, useClass: SeguridadInterceptor, multi: true}
   ],
   bootstrap: [AppComponent],
 // Significa que el componente sera generado por una accion de

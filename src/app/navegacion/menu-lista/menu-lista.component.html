@@ -3,6 +3,17 @@
         <mat-icon>home</mat-icon>
         <span class="navegacion-list-label">Inicio</span>
     </a>
+
+    <a mat-list-item routerLink="/books" (click)="onCerrarMenu()" *ngIf="estadoUsuario">
+        <mat-icon>book</mat-icon>
+        <span class="navegacion-list-label">Libros</span>
+    </a>
+
+    <a mat-list-item routerLink="/autores" (click)="onCerrarMenu()" *ngIf="estadoUsuario">
+        <mat-icon>groups</mat-icon>
+        <span class="navegacion-list-label">Autores</span>
+    </a>
+
     <a mat-list-item routerLink="/registrar" (click)="onCerrarMenu()" *ngIf="!estadoUsuario">
         <mat-icon>how_to_reg</mat-icon>
         <span class="navegacion-list-label">Registrar</span>

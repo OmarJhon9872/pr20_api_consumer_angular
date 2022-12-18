@@ -1,68 +1,150 @@
-import {Usuario} from './usuario.model';
-import { LoginData } from "./login-data.model";
-import {Subject} from 'rxjs';
+import { Usuario } from './usuario.model';
+import { LoginData } from './login-data.model';
+import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
+import { environment } from './../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 // Para poder inyectar el servicio de router
-@Injectable()
-export class SeguridadService{
+@Injectable({
+    providedIn: 'root',
+})
+export class SeguridadService {
     private usuario: Usuario;
+
+    // Autorizacion
+    baseUrl = environment.baseUrl;
+    token = '';
 
     // Observable tras cada cambio
     seguridadCambio = new Subject<boolean>();
 
-    constructor(private router: Router){
+    constructor(private router: Router, private http: HttpClient) {}
 
-    }
-
-    registrarUsuario(usr: Usuario){
-        this.usuario = {
-            email: usr.email,
-            usuarioId: Math.round(Math.random() * 10000).toString(),
-            nombre: usr.nombre,
-            apellidos: usr.apellidos,
-            username: usr.username,
-            password: ''
+    cargarUsuario() {
+        const tokenBrowser = localStorage.getItem('token');
+        if (!tokenBrowser) {
+            return;
         }
 
-        // Emision de eventos de un observable
+        this.token = tokenBrowser;
         this.seguridadCambio.next(true);
 
-        this.router.navigate(['/']);
+        this.http
+            .get<Usuario>(this.baseUrl + 'usuario')
+            .subscribe((response) => {
+                console.log('Login respuesta: ', response);
+
+                this.token = response.token;
+
+                this.usuario = {
+                    usuarioId: response.usuarioId,
+                    email: response.email,
+                    nombre: response.nombre,
+                    apellido: response.apellido,
+                    username: response.username,
+                    password: '',
+                    token: response.token,
+                };
+
+                // Notifica a componentes que le consulten que se
+                // ha iniciado sesion
+                this.seguridadCambio.next(true);
+                // Guardamos en localstorage el token
+                localStorage.setItem('token', response.token);
+            });
     }
 
-    login(loginData: LoginData){
-        this.usuario = {
-            email: loginData.email,
-            usuarioId: Math.round(Math.random() * 10000).toString(),
-            nombre: '',
-            apellidos: '',
-            username: '',
-            password: ''
-        }
+    registrarUsuario(usr: Usuario) {
+        this.http
+            .post<Usuario>(this.baseUrl + 'usuario/registrar', usr)
+            .subscribe((response) => {
+                this.token = response.token;
+
+                this.usuario = {
+                    usuarioId: response.usuarioId,
+                    email: response.email,
+                    nombre: response.nombre,
+                    apellido: response.apellido,
+                    username: response.username,
+                    password: '',
+                    token: response.token,
+                };
+
+                // Notifica a componentes que le consulten que se
+                // ha iniciado sesion
+                this.seguridadCambio.next(true);
+                // Guardamos en localstorage el token
+                localStorage.setItem('token', response.token);
+                this.router.navigate(['/']);
+            });
+
+        // this.usuario = {
+        //     email: usr.email,
+        //     usuarioId: Math.round(Math.random() * 10000).toString(),
+        //     nombre: usr.nombre,
+        //     apellidos: usr.apellidos,
+        //     username: usr.username,
+        //     password: '',
+        //     token: ''
+        // }
 
         // Emision de eventos de un observable
-        this.seguridadCambio.next(true);
+        // this.seguridadCambio.next(true);
 
-        this.router.navigate(['/']);
+        // this.router.navigate(['/']);
     }
 
-    salirSesion(){
+    obtenerToken(): string {
+        return this.token;
+    }
+
+    login(loginData: LoginData) {
+        this.http
+            .post<Usuario>(this.baseUrl + 'usuario/login', loginData)
+            .subscribe((response) => {
+                console.log('Login respuesta: ', response);
+
+                this.token = response.token;
+
+                this.usuario = {
+                    usuarioId: response.usuarioId,
+                    email: response.email,
+                    nombre: response.nombre,
+                    apellido: response.apellido,
+                    username: response.username,
+                    password: '',
+                    token: response.token,
+                };
+
+                // Notifica a componentes que le consulten que se
+                // ha iniciado sesion
+                this.seguridadCambio.next(true);
+                // Guardamos en localstorage el token
+                localStorage.setItem('token', response.token);
+                this.router.navigate(['/']);
+            });
+    }
+
+    salirSesion() {
         this.usuario = {} as Usuario;
 
         // Emision de eventos de un observable
         this.seguridadCambio.next(false);
 
+        // Eliminamos token
+        localStorage.removeItem('token');
+
         this.router.navigate(['/login']);
     }
 
-    obtenerUsuario(){
+    obtenerUsuario() {
         // Me devolvera el usuario mas actualizado
-        return {...this.usuario};
+        return { ...this.usuario };
     }
 
-    usuarioEstaEnSesion(){
-        return this.usuario != null;
+    usuarioEstaEnSesion() {
+        return this.token != null;
     }
 }

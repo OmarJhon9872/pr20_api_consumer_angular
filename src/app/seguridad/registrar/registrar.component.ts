@@ -16,10 +16,11 @@ export class RegistrarComponent implements OnInit {
         this.seguridadService.registrarUsuario({
             email: form.value.email,
             password: form.value.password,
-            apellidos: form.value.apellidos,
+            apellido: form.value.apellidos,
             nombre: form.value.nombre,
             username: form.value.username,
-            usuarioId: ''
+            usuarioId: '',
+            token: ''
         });
     }
 }

@@ -15,6 +15,12 @@
             <li *ngIf="estadoUsuario">
                 <a routerLink="/">Home</a>
             </li>
+            <li *ngIf="estadoUsuario">
+                <a routerLink="/books">Libros</a>
+            </li>
+            <li *ngIf="estadoUsuario">
+                <a routerLink="/autores">Autores</a>
+            </li>
             <li *ngIf="estadoUsuario" (click)="terminarSesion()">
                 <a routerLink="/">Salir</a>
             </li>
